@@ -24,13 +24,13 @@
 package org.lightjason.agentspeak.action.blas;
 
 import cern.colt.matrix.tdouble.algo.DoubleFormatter;
-import org.lightjason.agentspeak.action.generic.CPrint;
+import org.lightjason.agentspeak.action.generic.IBaseFormatter;
 
 
 /**
  * base formatter of blas structures
  */
-public abstract class IBaseFormat<T> extends CPrint.IFormatter<T>
+public abstract class IBaseFormat<T> extends IBaseFormatter<T>
 {
     /**
      * formatter definition

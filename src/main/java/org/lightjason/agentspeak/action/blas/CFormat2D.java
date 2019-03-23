@@ -39,7 +39,7 @@ public final class CFormat2D extends IBaseFormat<DoubleMatrix2D>
     private static final long serialVersionUID = 2504711213170928363L;
 
     @Override
-    protected Class<?> getType()
+    public Class<?> get()
     {
         return DoubleMatrix2D.class;
     }
