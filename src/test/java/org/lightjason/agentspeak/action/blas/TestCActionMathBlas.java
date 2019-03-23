@@ -31,11 +31,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.lightjason.agentspeak.IBaseTest;
+import org.lightjason.agentspeak.action.generic.CPrint;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +50,10 @@ import java.util.stream.Stream;
  */
 public final class TestCActionMathBlas extends IBaseTest
 {
+    /**
+     * minus string
+     */
+    private static final String MINUS = "-";
     /**
      * testing matrix
      */
@@ -124,11 +133,11 @@ public final class TestCActionMathBlas extends IBaseTest
             Stream.of(
                     m_matrix1, "+", m_matrix2,
                     m_matrix1, "+", 5,
-                    m_matrix1, "-", 5,
+                    m_matrix1, MINUS, 5,
                     m_matrix1, "*", 5,
                     m_matrix1, "/", 2,
                     m_matrix1, "|+|", m_matrix2,
-                    m_matrix1, "-", m_matrix2,
+                    m_matrix1, MINUS, m_matrix2,
                     m_matrix1, "*", m_matrix2,
                     m_matrix1, "|+|", -9
                 ).map( CRawTerm::of ).collect( Collectors.toList() ),
@@ -145,7 +154,6 @@ public final class TestCActionMathBlas extends IBaseTest
         Assert.assertArrayEquals( new double[][]{{0.0, 4.0}, {0.0, 7.0}}, l_return.get( 6 ).<DoubleMatrix2D>raw().toArray() );
         Assert.assertArrayEquals( new double[][]{{4.0, 12.0}, {9.0, 8.0}}, l_return.get( 7 ).<DoubleMatrix2D>raw().toArray() );
         Assert.assertArrayEquals( new double[][]{{7.0, 3.0}, {6.0, 1.0}}, l_return.get( 8 ).<DoubleMatrix2D>raw().toArray() );
-
     }
 
     /**
@@ -161,10 +169,10 @@ public final class TestCActionMathBlas extends IBaseTest
             Stream.of(
                     m_vector, "+", m_vector,
                     m_vector, "+", 5,
-                    m_vector, "-", 5,
+                    m_vector, MINUS, 5,
                     m_vector, "*", 5,
                     m_vector, "/", 2,
-                    m_vector, "-", m_vector,
+                    m_vector, MINUS, m_vector,
                     m_vector, "*", m_vector,
                     m_vector, "|+|", -5
                 ).map( CRawTerm::of ).collect( Collectors.toList() ),
@@ -180,7 +188,56 @@ public final class TestCActionMathBlas extends IBaseTest
         Assert.assertArrayEquals( new double[]{0.0, 0.0}, l_return.get( 5 ).<DoubleMatrix1D>raw().toArray(), 0 );
         Assert.assertArrayEquals( new double[]{4.0, 25.0}, l_return.get( 6 ).<DoubleMatrix1D>raw().toArray(), 0 );
         Assert.assertArrayEquals( new double[]{3.0, 0.0}, l_return.get( 7 ).<DoubleMatrix1D>raw().toArray(), 0 );
+    }
 
+    /**
+     * formatter of matrix-1d
+     *
+     * @throws Exception io exception
+     */
+    @Test
+    public void formatter1d() throws Exception
+    {
+        final ByteArrayOutputStream l_output = new ByteArrayOutputStream();
+        final CPrint l_print = new CPrint( () -> new PrintStream( l_output, false, StandardCharsets.UTF_8 ), MINUS );
+
+        l_print.formatter().add( new CFormat1D() );
+
+        Assert.assertTrue(
+            execute(
+                l_print,
+                false,
+                Stream.of( new DenseDoubleMatrix1D( new double[]{0, 1, 2, 3} ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
+                Collections.emptyList()
+            )
+        );
+
+        Assert.assertEquals( "[4](0,00000,1,00000,2,00000,3,00000)\n", l_output.toString( StandardCharsets.UTF_8 ) );
+    }
+
+    /**
+     * formatter of matrix-2d
+     *
+     * @throws Exception io exception
+     */
+    @Test
+    public void formatter2d() throws Exception
+    {
+        final ByteArrayOutputStream l_output = new ByteArrayOutputStream();
+        final CPrint l_print = new CPrint( () -> new PrintStream( l_output, false, StandardCharsets.UTF_8 ), MINUS );
+
+        l_print.formatter().add( new CFormat2D() );
+
+        Assert.assertTrue(
+            execute(
+                l_print,
+                false,
+                Stream.of( new DenseDoubleMatrix2D( new double[][]{{0, 1}, {2, 3}} ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
+                Collections.emptyList()
+            )
+        );
+
+        Assert.assertEquals( "[2x2](0,00000,1,00000; 2,00000,3,00000)\n", l_output.toString( StandardCharsets.UTF_8 ) );
     }
 
 }
