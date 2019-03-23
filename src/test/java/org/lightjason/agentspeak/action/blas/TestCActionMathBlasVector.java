@@ -49,6 +49,7 @@ import org.lightjason.agentspeak.action.blas.vector.CParse;
 import org.lightjason.agentspeak.action.blas.vector.CSet;
 import org.lightjason.agentspeak.action.blas.vector.CSum;
 import org.lightjason.agentspeak.action.blas.vector.CToList;
+import org.lightjason.agentspeak.error.context.CExecutionIllegealArgumentException;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
@@ -264,6 +265,20 @@ public final class TestCActionMathBlasVector extends IBaseTest
         );
 
         Assert.assertArrayEquals( VECTOR2.toArray(), l_vector.toArray(), 0 );
+    }
+
+    /**
+     * test assign error
+     */
+    @Test( expected = CExecutionIllegealArgumentException.class )
+    public void assignerror()
+    {
+        new CAssign().execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( "xxx", VECTOR1 ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            Collections.emptyList()
+        );
+
     }
 
 

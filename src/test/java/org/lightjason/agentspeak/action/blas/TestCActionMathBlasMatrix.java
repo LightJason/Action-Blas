@@ -77,6 +77,7 @@ import org.lightjason.agentspeak.action.blas.matrix.CToList;
 import org.lightjason.agentspeak.action.blas.matrix.CTrace;
 import org.lightjason.agentspeak.action.blas.matrix.CTranspose;
 import org.lightjason.agentspeak.action.blas.matrix.CTwoNorm;
+import org.lightjason.agentspeak.error.context.CExecutionIllegealArgumentException;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
@@ -461,7 +462,7 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
         );
 
         Assert.assertEquals( 1, l_return.size() );
-        Assert.assertArrayEquals( new double[]{0.614167, 0.613706, 0.496149}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0.01 );
+        Assert.assertArrayEquals( new double[]{0.614167, 0.613706, 0.496149}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0.1 );
     }
 
     /**
@@ -479,6 +480,19 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
         );
 
         Assert.assertArrayEquals( new double[][]{{2.0, 2.0}, {2.0, 2.0}}, l_matrix.toArray() );
+    }
+
+    /**
+     * test assign error
+     */
+    @Test( expected = CExecutionIllegealArgumentException.class )
+    public void assignerror()
+    {
+        new CAssign().execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( "xx", MATRIX1 ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            Collections.emptyList()
+        );
     }
 
     /**
@@ -566,11 +580,18 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
             l_return
         );
 
+        l_parse.execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( "1;1;1" ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
 
 
-        Assert.assertEquals( 2, l_return.size() );
+
+        Assert.assertEquals( 3, l_return.size() );
         Assert.assertTrue( l_return.get( 0 ).raw() instanceof DoubleMatrix2D );
         Assert.assertTrue( l_return.get( 1 ).raw() instanceof DoubleMatrix2D );
+        Assert.assertTrue( l_return.get( 2 ).raw() instanceof DoubleMatrix2D );
 
         Assert.assertArrayEquals(
             new double[][]{{1.0, 2.0}, {3.0, 4.0}},
@@ -579,6 +600,10 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
         Assert.assertArrayEquals(
             new double[][]{{4.0, 3.0}, {2.0, 1.0}, {0.0, 0.0}},
             l_return.get( 1 ).<DoubleMatrix2D>raw().toArray()
+        );
+        Assert.assertArrayEquals(
+            new double[][]{{1.0}, {1.0}, {1.0}},
+            l_return.get( 2 ).<DoubleMatrix2D>raw().toArray()
         );
     }
 
