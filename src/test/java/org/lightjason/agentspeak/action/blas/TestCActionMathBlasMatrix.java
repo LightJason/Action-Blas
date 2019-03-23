@@ -60,6 +60,7 @@ import org.lightjason.agentspeak.action.blas.matrix.CNonZero;
 import org.lightjason.agentspeak.action.blas.matrix.CNormalizedGraphLaplacian;
 import org.lightjason.agentspeak.action.blas.matrix.COneNorm;
 import org.lightjason.agentspeak.action.blas.matrix.CParse;
+import org.lightjason.agentspeak.action.blas.matrix.CPerronFrobenius;
 import org.lightjason.agentspeak.action.blas.matrix.CPower;
 import org.lightjason.agentspeak.action.blas.matrix.CRank;
 import org.lightjason.agentspeak.action.blas.matrix.CRow;
@@ -400,6 +401,25 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
             new DenseDoubleMatrix2D( new double[][]{{1.0, -4.999999999999998}, {0.0, 1.9999999999999993}} ).toArray(),
             l_return.get( 0 ).<DoubleMatrix2D>raw().toArray()
         );
+    }
+
+    /**
+     * test perron-frobenius
+     */
+    @Test
+    public void perronfrobenius()
+    {
+        final List<ITerm> l_return = new ArrayList<>();
+        final DoubleMatrix2D l_matrix = new DenseDoubleMatrix2D( new double[][]{{0.1, 0.5, 0.3}, {0.5, 0.1, 0.3}, {0.3, 0.3, 0.1}} );
+
+        new CPerronFrobenius().execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( 5, l_matrix ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+        Assert.assertEquals( 1, l_return.size() );
+        Assert.assertArrayEquals( new double[]{0.614167, 0.613706, 0.496149}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0.01 );
     }
 
     /**

@@ -95,7 +95,7 @@ public final class CPerronFrobenius extends IBaseAlgebra
             .range( 0, l_arguments.size() - 1 )
             .parallel()
             .boxed()
-            .map( i -> new double[l_arguments.get( i ).<DoubleMatrix2D>raw().rows()] )
+            .map( i -> new double[l_arguments.get( i + 1 ).<DoubleMatrix2D>raw().rows()] )
             .map( DenseDoubleMatrix1D::new )
             .peek( i -> IntStream.range( 0, Long.valueOf( i.size() ).intValue() ).forEach( j -> i.setQuick( j, l_random.nextDouble() ) ) )
             .collect( Collectors.toList() );
@@ -103,9 +103,9 @@ public final class CPerronFrobenius extends IBaseAlgebra
         // run iteration
         IntStream.range( 0, l_arguments.get( 0 ).<Number>raw().intValue() )
                  .forEach( i -> IntStream
-                     .range( 0, l_arguments.size() )
-                     .boxed()
+                     .range( 0, l_arguments.size() - 1 )
                      .parallel()
+                     .boxed()
                      .forEach( j ->
                      {
                          l_eigenvector.get( j ).assign( DENSEALGEBRA.mult( l_arguments.get( j + 1 ).<DoubleMatrix2D>raw(), l_eigenvector.get( j ) ) );
@@ -118,4 +118,5 @@ public final class CPerronFrobenius extends IBaseAlgebra
 
         return Stream.of();
     }
+
 }
