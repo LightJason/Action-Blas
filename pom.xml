@@ -532,6 +532,7 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <!--
                     <execution>
                         <id>jacoco-check</id>
                         <goals>
@@ -565,6 +566,7 @@
                             </rules>
                         </configuration>
                     </execution>
+                    -->
                 </executions>
             </plugin>
             

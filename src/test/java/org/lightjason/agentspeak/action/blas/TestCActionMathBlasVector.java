@@ -23,6 +23,7 @@
 
 package org.lightjason.agentspeak.action.blas;
 
+import cern.colt.matrix.AbstractMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import com.codepoetics.protonpack.StreamUtils;
@@ -42,6 +43,7 @@ import org.lightjason.agentspeak.action.blas.vector.CCreate;
 import org.lightjason.agentspeak.action.blas.vector.CDotProduct;
 import org.lightjason.agentspeak.action.blas.vector.CFromList;
 import org.lightjason.agentspeak.action.blas.vector.CGet;
+import org.lightjason.agentspeak.action.blas.vector.CLambdaStreaming;
 import org.lightjason.agentspeak.action.blas.vector.CNonZero;
 import org.lightjason.agentspeak.action.blas.vector.CParse;
 import org.lightjason.agentspeak.action.blas.vector.CSet;
@@ -50,6 +52,8 @@ import org.lightjason.agentspeak.action.blas.vector.CToList;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
+import org.lightjason.agentspeak.language.execution.IExecution;
+import org.lightjason.agentspeak.language.execution.lambda.ILambdaStreaming;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -162,22 +166,32 @@ public final class TestCActionMathBlasVector extends IBaseTest
     public void create()
     {
         final List<ITerm> l_return = new ArrayList<>();
+        final IExecution l_create = new CCreate();
 
-        new CCreate().execute(
+
+        l_create.execute(
             false, IContext.EMPTYPLAN,
             Stream.of( 2, "dense" ).map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        new CCreate().execute(
+        l_create.execute(
             false, IContext.EMPTYPLAN,
             Stream.of( 4, "sparse" ).map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        Assert.assertEquals( 2, l_return.size() );
+        l_create.execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( 3 ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+
+        Assert.assertEquals( 3, l_return.size() );
         Assert.assertEquals( 2, l_return.get( 0 ).<DoubleMatrix1D>raw().size() );
         Assert.assertEquals( 4, l_return.get( 1 ).<DoubleMatrix1D>raw().size() );
+        Assert.assertEquals( 3, l_return.get( 2 ).<DoubleMatrix1D>raw().size() );
     }
 
     /**
@@ -340,4 +354,31 @@ public final class TestCActionMathBlasVector extends IBaseTest
         Assert.assertArrayEquals( new double[]{4, 3, 4}, l_return.get( 1 ).<DoubleMatrix1D>raw().toArray(), 0 );
     }
 
+    /**
+     * test lambda streaming assignable
+     */
+    @Test
+    public void lambdaassignable()
+    {
+        final ILambdaStreaming<?> l_lambda = new CLambdaStreaming();
+
+        Assert.assertTrue(
+            Stream.of(
+                AbstractMatrix1D.class,
+                DoubleMatrix1D.class
+            ).allMatch( i -> l_lambda.assignable().collect( Collectors.toSet() ).contains( i ) )
+        );
+    }
+
+    /**
+     * test lambda streaming
+     */
+    @Test
+    public void lambda()
+    {
+        Assert.assertArrayEquals(
+            Stream.of( 2.0, 5.0, 3.0, 8.0 ).toArray(),
+            new CLambdaStreaming().apply( VECTOR1 ).toArray()
+        );
+    }
 }

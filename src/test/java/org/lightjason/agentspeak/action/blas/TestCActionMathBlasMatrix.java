@@ -23,6 +23,7 @@
 
 package org.lightjason.agentspeak.action.blas;
 
+import cern.colt.matrix.AbstractMatrix2D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
@@ -55,6 +56,7 @@ import org.lightjason.agentspeak.action.blas.matrix.CGraphLaplacian;
 import org.lightjason.agentspeak.action.blas.matrix.CIdentity;
 import org.lightjason.agentspeak.action.blas.matrix.CInfinityNorm;
 import org.lightjason.agentspeak.action.blas.matrix.CInvert;
+import org.lightjason.agentspeak.action.blas.matrix.CLambdaStreaming;
 import org.lightjason.agentspeak.action.blas.matrix.CMatrixNorm;
 import org.lightjason.agentspeak.action.blas.matrix.CNonZero;
 import org.lightjason.agentspeak.action.blas.matrix.CNormalizedGraphLaplacian;
@@ -78,6 +80,8 @@ import org.lightjason.agentspeak.action.blas.matrix.CTwoNorm;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
+import org.lightjason.agentspeak.language.execution.IExecution;
+import org.lightjason.agentspeak.language.execution.lambda.ILambdaStreaming;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -88,8 +92,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * test math blas matrix functions
@@ -212,19 +214,46 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
     public void create()
     {
         final List<ITerm> l_return = new ArrayList<>();
+        final IExecution l_create = new CCreate();
 
-        new CCreate().execute(
+        l_create.execute(
             false,
             IContext.EMPTYPLAN,
             Stream.of( 2, 2, "dense" ).map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        Assert.assertEquals( 1, l_return.size() );
-        assertTrue( l_return.get( 0 ).raw() instanceof DoubleMatrix2D );
+        l_create.execute(
+            false,
+            IContext.EMPTYPLAN,
+            Stream.of( 2, 3, "sparse" ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+        l_create.execute(
+            false,
+            IContext.EMPTYPLAN,
+            Stream.of( 4, 4 ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+
+        Assert.assertEquals( 3, l_return.size() );
+        Assert.assertTrue( l_return.get( 0 ).raw() instanceof DoubleMatrix2D );
+        Assert.assertTrue( l_return.get( 1 ).raw() instanceof DoubleMatrix2D );
+        Assert.assertTrue( l_return.get( 2 ).raw() instanceof DoubleMatrix2D );
+
         Assert.assertEquals( 4, l_return.get( 0 ).<DoubleMatrix2D>raw().size() );
         Assert.assertEquals( 2, l_return.get( 0 ).<DoubleMatrix2D>raw().rows() );
         Assert.assertEquals( 2, l_return.get( 0 ).<DoubleMatrix2D>raw().columns() );
+
+        Assert.assertEquals( 6, l_return.get( 1 ).<DoubleMatrix2D>raw().size() );
+        Assert.assertEquals( 2, l_return.get( 1 ).<DoubleMatrix2D>raw().rows() );
+        Assert.assertEquals( 3, l_return.get( 1 ).<DoubleMatrix2D>raw().columns() );
+
+        Assert.assertEquals( 16, l_return.get( 2 ).<DoubleMatrix2D>raw().size() );
+        Assert.assertEquals( 4, l_return.get( 2 ).<DoubleMatrix2D>raw().rows() );
+        Assert.assertEquals( 4, l_return.get( 2 ).<DoubleMatrix2D>raw().columns() );
     }
 
     /**
@@ -387,19 +416,32 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
     public void solve()
     {
         final List<ITerm> l_return = new ArrayList<>();
+        final IExecution l_solve = new CSolve();
 
-        new CSolve().execute(
+        l_solve.execute(
             false, IContext.EMPTYPLAN,
             Stream.of( MATRIX1, MATRIX2 ).map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        Assert.assertEquals( 1, l_return.size() );
+        l_solve.execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( MATRIX1, new DenseDoubleMatrix1D( new double[]{2, 3} ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+        Assert.assertEquals( 2, l_return.size() );
         Assert.assertTrue( l_return.get( 0 ).raw() instanceof DoubleMatrix2D );
+        Assert.assertTrue( l_return.get( 1 ).raw() instanceof DoubleMatrix2D );
 
         Assert.assertArrayEquals(
-            new DenseDoubleMatrix2D( new double[][]{{1.0, -4.999999999999998}, {0.0, 1.9999999999999993}} ).toArray(),
+            new double[][]{{1.0, -4.999999999999998}, {0.0, 1.9999999999999993}},
             l_return.get( 0 ).<DoubleMatrix2D>raw().toArray()
+        );
+
+        Assert.assertArrayEquals(
+            new double[][]{{1.0}, {0.0}},
+            l_return.get( 1 ).<DoubleMatrix2D>raw().toArray()
         );
     }
 
@@ -437,6 +479,34 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
         );
 
         Assert.assertArrayEquals( new double[][]{{2.0, 2.0}, {2.0, 2.0}}, l_matrix.toArray() );
+    }
+
+    /**
+     * test lambda streaming assignable
+     */
+    @Test
+    public void lambdaassignable()
+    {
+        final ILambdaStreaming<?> l_lambda = new CLambdaStreaming();
+
+        Assert.assertTrue(
+            Stream.of(
+                AbstractMatrix2D.class,
+                DoubleMatrix2D.class
+            ).allMatch( i -> l_lambda.assignable().collect( Collectors.toSet() ).contains( i ) )
+        );
+    }
+
+    /**
+     * test lambda streaming
+     */
+    @Test
+    public void lambda()
+    {
+        Assert.assertArrayEquals(
+            Stream.of( 2.0, 3.0, 6.0, 8.0 ).toArray(),
+            new CLambdaStreaming().apply( MATRIX1 ).toArray()
+        );
     }
 
     /**
@@ -482,18 +552,33 @@ public final class TestCActionMathBlasMatrix extends IBaseTest
     public void parse()
     {
         final List<ITerm> l_return = new ArrayList<>();
+        final IExecution l_parse = new CParse();
 
-        new CParse().execute(
+        l_parse.execute(
             false, IContext.EMPTYPLAN,
             Stream.of( "1,2;3,4", "dense" ).map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        Assert.assertEquals( 1, l_return.size() );
+        l_parse.execute(
+            false, IContext.EMPTYPLAN,
+            Stream.of( "4,3;2,1;0,0", "sparse" ).map( CRawTerm::of ).collect( Collectors.toList() ),
+            l_return
+        );
+
+
+
+        Assert.assertEquals( 2, l_return.size() );
         Assert.assertTrue( l_return.get( 0 ).raw() instanceof DoubleMatrix2D );
+        Assert.assertTrue( l_return.get( 1 ).raw() instanceof DoubleMatrix2D );
+
         Assert.assertArrayEquals(
-            new DenseDoubleMatrix2D( new double[][]{{1.0, 2.0}, {3.0, 4.0}} ).toArray(),
+            new double[][]{{1.0, 2.0}, {3.0, 4.0}},
             l_return.get( 0 ).<DoubleMatrix2D>raw().toArray()
+        );
+        Assert.assertArrayEquals(
+            new double[][]{{4.0, 3.0}, {2.0, 1.0}, {0.0, 0.0}},
+            l_return.get( 1 ).<DoubleMatrix2D>raw().toArray()
         );
     }
 
