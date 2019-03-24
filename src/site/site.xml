@@ -31,7 +31,7 @@
         <menu ref="reports"/>
         <menu name="Source Documentation">
             <item name="Source Documentation" href="sources/"/>
-            <item name="Repository" href="http://github.com/LightJason/Action-Graph" />
+            <item name="Repository" href="http://github.com/LightJason/Action-Blas" />
             <item name="LightJason" href="http://lightjason.org"/>
         </menu>
     </body>

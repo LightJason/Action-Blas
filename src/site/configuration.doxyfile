@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "LightJason - AgentSpeak(L++) Graph Action"
+PROJECT_NAME           = "LightJason - AgentSpeak(L++) BLAS Action"
 PROJECT_NUMBER         =
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
