@@ -30,11 +30,11 @@ import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.lightjason.agentspeak.IBaseTest;
 import org.lightjason.agentspeak.action.generic.CPrint;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
 import org.lightjason.agentspeak.language.execution.IContext;
+import org.lightjason.agentspeak.testing.IBaseTest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
