@@ -31,7 +31,7 @@
     <!-- project meta information -->
     <name>LightJason AgentSpeak(L++) - BLAS Action</name>
     <description>AgentSpeak(L++) action for blas structure</description>
-    <url>https://github.com/LightJason/AgentSpeak</url>
+    <url>https://github.com/LightJason/Java-Action-Blas</url>
     
     <organization>
         <name>LightJason</name>
@@ -47,13 +47,13 @@
     
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/LightJason/Action-Blas/issues</url>
+        <url>https://github.com/LightJason/Java-Action-Blas/issues</url>
     </issueManagement>
     
     <scm>
-        <url>https://github.com/LightJason/Action-Blas</url>
-        <connection>scm:git:git://github.com:LightJason/Action-Blas.git</connection>
-        <developerConnection>scm:git:git@github.com:LightJason/Action-Blas.git</developerConnection>
+        <url>https://github.com/LightJason/Java-Action-Blas</url>
+        <connection>scm:git:git://github.com:LightJason/Java-Action-Blas.git</connection>
+        <developerConnection>scm:git:git@github.com:LightJason/Java-Action-Blas.git</developerConnection>
         <tag>v0.0.1</tag>
     </scm>
     
