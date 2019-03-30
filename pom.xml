@@ -121,9 +121,9 @@
         
         <!-- main structures -->
         <dependency>
-            <groupId>org.lightjason</groupId>
-            <artifactId>agentspeak</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <groupId>org.lightjason.agentspeak.action</groupId>
+            <artifactId>generic</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
