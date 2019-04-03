@@ -126,17 +126,11 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.sourceforge.parallelcolt</groupId>
-            <artifactId>parallelcolt</artifactId>
-            <version>0.10.1</version>
-        </dependency>
-        
         <!-- checking -->
         <dependency>
             <groupId>com.github.spotbugs</groupId>
             <artifactId>spotbugs-annotations</artifactId>
-            <version>3.1.12</version>
+            <version>4.0.0-beta1</version>
             <scope>provided</scope>
         </dependency>
         
