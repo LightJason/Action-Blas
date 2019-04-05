@@ -89,23 +89,39 @@ public final class CElementWise extends IBaseAction
             3
         ).allMatch( i ->
         {
+            // for matrix 1d and 2d musst be the codes implement twice because of the inherited copy-method
 
             switch ( i.get( 1 ).<String>raw().trim() )
             {
                 case "+":
-                    return CElementWise.apply( i.get( 0 ), i.get( 2 ), DoubleFunctions.plus, ( n, m ) -> n + m, p_return );
+                    return Stream.of(
+                        apply1d( i.get( 0 ), i.get( 2 ), DoubleFunctions.plus, Double::sum, p_return ),
+                        apply2d( i.get( 0 ), i.get( 2 ), DoubleFunctions.plus, Double::sum, p_return )
+                    ).filter( j -> j ).findFirst().orElse( false );
 
                 case "|+|":
-                    return CElementWise.apply( i.get( 0 ), i.get( 2 ), DoubleFunctions.plusAbs, ( n, m ) -> Math.abs( n + m ), p_return );
+                    return Stream.of(
+                        apply1d( i.get( 0 ), i.get( 2 ), DoubleFunctions.plusAbs, ( n, m ) -> Math.abs( n + m ), p_return ),
+                        apply2d( i.get( 0 ), i.get( 2 ), DoubleFunctions.plusAbs, ( n, m ) -> Math.abs( n + m ), p_return )
+                    ).filter( j -> j ).findFirst().orElse( false );
 
                 case "-":
-                    return CElementWise.apply( i.get( 0 ), i.get( 2 ), DoubleFunctions.minus, ( n, m ) -> n - m, p_return );
+                    return Stream.of(
+                        apply1d( i.get( 0 ), i.get( 2 ), DoubleFunctions.minus, ( n, m ) -> n - m, p_return ),
+                        apply2d( i.get( 0 ), i.get( 2 ), DoubleFunctions.minus, ( n, m ) -> n - m, p_return )
+                    ).filter( j -> j ).findFirst().orElse( false );
 
                 case "*":
-                    return CElementWise.apply( i.get( 0 ), i.get( 2 ), DoubleFunctions.mult, ( n, m ) -> n * m, p_return );
+                    return Stream.of(
+                        apply1d( i.get( 0 ), i.get( 2 ), DoubleFunctions.mult, ( n, m ) -> n * m, p_return ),
+                        apply2d( i.get( 0 ), i.get( 2 ), DoubleFunctions.mult, ( n, m ) -> n * m, p_return )
+                    ).filter( j -> j ).findFirst().orElse( false );
 
                 case "/":
-                    return CElementWise.apply( i.get( 0 ), i.get( 2 ), DoubleFunctions.div, ( n, m ) -> n / m, p_return );
+                    return Stream.of(
+                        apply1d( i.get( 0 ), i.get( 2 ), DoubleFunctions.div, ( n, m ) -> n / m, p_return ),
+                        apply2d( i.get( 0 ), i.get( 2 ), DoubleFunctions.div, ( n, m ) -> n / m, p_return )
+                    ).filter( j -> j ).findFirst().orElse( false );
 
                 default:
                     return false;
@@ -119,62 +135,75 @@ public final class CElementWise extends IBaseAction
 
 
     /**
-     * elementwise assign
+     * elementwise assign for matrix
      *
-     * @param p_left left term argument (matrix argument)
-     * @param p_right matrix or scalar value argument
+     * @param p_lhs left-hand-side (matrix argument)
+     * @param p_rhs right-hand-side (matrix or scalar value argument
      * @param p_matrixfunction function for matrix-matrix operation
      * @param p_scalarfunction scalar function for value
      * @param p_return return list
      * @return successful executed
-     *
-     * @note DoubleMatrix1D and DoubleMatrix2D does not use an equal
-     * super class for defining the assign method, so code must be
-     * created twice for each type
      */
-    private static boolean apply( final ITerm p_left, final ITerm p_right,
-                                  final DoubleDoubleFunction p_matrixfunction, final BiFunction<Double, Double, Double> p_scalarfunction,
-                                  final List<ITerm> p_return
-    )
+    private static boolean apply2d( @Nonnull final ITerm p_lhs, @Nonnull final ITerm p_rhs,
+                                    @Nonnull final DoubleDoubleFunction p_matrixfunction,
+                                    @Nonnull final BiFunction<Double, Double, Double> p_scalarfunction,
+                                    @Nonnull final List<ITerm> p_return )
     {
-        // operation for matrix
-        if ( CCommon.isssignableto( p_left, DoubleMatrix2D.class ) )
+        if ( !CCommon.isssignableto( p_lhs, DoubleMatrix2D.class ) )
+            return false;
+
+        final DoubleMatrix2D l_assign = p_lhs.<DoubleMatrix2D>raw().copy();
+
+        if ( CCommon.isssignableto( p_rhs, DoubleMatrix2D.class ) )
         {
-            final DoubleMatrix2D l_assign = p_left.<DoubleMatrix2D>raw().copy();
-
-            if ( CCommon.isssignableto( p_right, DoubleMatrix2D.class ) )
-            {
-                l_assign.assign( p_right.raw(), p_matrixfunction );
-                p_return.add( CRawTerm.of( l_assign ) );
-                return true;
-            }
-
-            if ( CCommon.isssignableto( p_right, Number.class ) )
-            {
-                l_assign.assign( i -> p_scalarfunction.apply( i, p_right.<Number>raw().doubleValue() ) );
-                p_return.add( CRawTerm.of( l_assign ) );
-                return true;
-            }
+            l_assign.assign( p_rhs.raw(), p_matrixfunction );
+            p_return.add( CRawTerm.of( l_assign ) );
+            return true;
         }
 
-        // operation for vector
-        if ( CCommon.isssignableto( p_left, DoubleMatrix1D.class ) )
+        if ( CCommon.isssignableto( p_rhs, Number.class ) )
         {
-            final DoubleMatrix1D l_assign = p_left.<DoubleMatrix1D>raw().copy();
+            l_assign.assign( i -> p_scalarfunction.apply( i, p_rhs.<Number>raw().doubleValue() ) );
+            p_return.add( CRawTerm.of( l_assign ) );
+            return true;
+        }
 
-            if ( CCommon.isssignableto( p_right, DoubleMatrix1D.class ) )
-            {
-                l_assign.assign( p_right.raw(), p_matrixfunction );
-                p_return.add( CRawTerm.of( l_assign ) );
-                return true;
-            }
+        return false;
+    }
 
-            if ( CCommon.isssignableto( p_right, Number.class ) )
-            {
-                l_assign.assign( i -> p_scalarfunction.apply( i, p_right.<Number>raw().doubleValue() ) );
-                p_return.add( CRawTerm.of( l_assign ) );
-                return true;
-            }
+
+    /**
+     * elementwise assign
+     *
+     * @param p_lhs left-hand-side (matrix argument)
+     * @param p_rhs right-hand-side (matrix or scalar value argument
+     * @param p_matrixfunction function for matrix-matrix operation
+     * @param p_scalarfunction scalar function for value
+     * @param p_return return list
+     * @return successful executed
+     */
+    private static boolean apply1d( @Nonnull final ITerm p_lhs, @Nonnull final ITerm p_rhs,
+                                    @Nonnull final DoubleDoubleFunction p_matrixfunction,
+                                    @Nonnull final BiFunction<Double, Double, Double> p_scalarfunction,
+                                    @Nonnull final List<ITerm> p_return )
+    {
+        if ( !CCommon.isssignableto( p_lhs, DoubleMatrix1D.class ) )
+            return false;
+
+        final DoubleMatrix1D l_assign = p_lhs.<DoubleMatrix1D>raw().copy();
+
+        if ( CCommon.isssignableto( p_rhs, DoubleMatrix1D.class ) )
+        {
+            l_assign.assign( p_rhs.raw(), p_matrixfunction );
+            p_return.add( CRawTerm.of( l_assign ) );
+            return true;
+        }
+
+        if ( CCommon.isssignableto( p_rhs, Number.class ) )
+        {
+            l_assign.assign( i -> p_scalarfunction.apply( i, p_rhs.<Number>raw().doubleValue() ) );
+            p_return.add( CRawTerm.of( l_assign ) );
+            return true;
         }
 
         return false;
