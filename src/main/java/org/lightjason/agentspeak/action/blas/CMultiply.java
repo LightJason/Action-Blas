@@ -83,32 +83,38 @@ public final class CMultiply extends IBaseAlgebra
                 CCommon.flatten( p_argument ),
                 2,
                 2
-            ).parallel().allMatch( i ->
-            {
-
-                if ( CCommon.isssignableto( i.get( 0 ), DoubleMatrix1D.class ) && CCommon.isssignableto(
-                    i.get( 1 ), DoubleMatrix1D.class ) )
-                    return CMultiply.<DoubleMatrix1D, DoubleMatrix1D>apply(
-                        i.get( 0 ), i.get( 1 ), ( u, v ) -> DENSEALGEBRA.multOuter( u, v, null ), p_return );
-
-                if ( CCommon.isssignableto( i.get( 0 ), DoubleMatrix2D.class ) && CCommon.isssignableto(
-                    i.get( 1 ), DoubleMatrix2D.class ) )
-                    return CMultiply.<DoubleMatrix2D, DoubleMatrix2D>apply( i.get( 0 ), i.get( 1 ), DENSEALGEBRA::mult, p_return );
-
-                if ( CCommon.isssignableto( i.get( 0 ), DoubleMatrix2D.class ) && CCommon.isssignableto(
-                    i.get( 1 ), DoubleMatrix1D.class ) )
-                    return CMultiply.<DoubleMatrix2D, DoubleMatrix1D>apply( i.get( 0 ), i.get( 1 ), DENSEALGEBRA::mult, p_return );
-
-                return CCommon.isssignableto( i.get( 0 ), DoubleMatrix1D.class ) && CCommon.isssignableto(
-                    i.get( 1 ), DoubleMatrix2D.class )
-                       && CMultiply.<DoubleMatrix1D, DoubleMatrix2D>apply(
-                    i.get( 0 ), i.get( 1 ), ( u, v ) -> DENSEALGEBRA.mult( v, u ), p_return );
-
-            } )
-        )
+            ).parallel().allMatch( i -> CCommon.streamconcatstrict(
+            cast( DoubleMatrix1D.class, DoubleMatrix1D.class, i.get( 0 ), i.get( 1 ), ( u, v ) -> DENSEALGEBRA.multOuter( u, v, null ), p_return ),
+            cast( DoubleMatrix2D.class, DoubleMatrix2D.class, i.get( 0 ), i.get( 1 ), DENSEALGEBRA::mult, p_return ),
+            cast( DoubleMatrix2D.class, DoubleMatrix1D.class, i.get( 0 ), i.get( 1 ), DENSEALGEBRA::mult, p_return ),
+            cast( DoubleMatrix1D.class, DoubleMatrix2D.class, i.get( 0 ), i.get( 1 ), ( u, v ) -> DENSEALGEBRA.mult( v, u ), p_return )
+            ).findFirst().orElse( false )
+        ) )
             throw new CExecutionIllegalStateException( p_context, org.lightjason.agentspeak.common.CCommon.languagestring( this, "operatorerror" ) );
 
         return Stream.of();
+    }
+
+    /**
+     * execute with casting
+     *
+     * @param p_lhsclass left-hand-side class
+     * @param p_rhsclass right-hand-side class
+     * @param p_lhs left-hand-side
+     * @param p_rhs right-hand-side
+     * @param p_function executoin function
+     * @param p_return return value
+     * @tparam U left-hand-side type
+     * @tparam V right-hand-side type
+     * @return successfully flag
+     */
+    private static <U, V> Stream<Boolean> cast( @Nonnull final Class<U> p_lhsclass, @Nonnull final Class<V> p_rhsclass,
+                                                @Nonnull final ITerm p_lhs, @Nonnull final ITerm p_rhs,
+                                                @Nonnull final BiFunction<U, V, ?> p_function, @Nonnull final List<ITerm> p_return )
+    {
+        return CCommon.isssignableto( p_lhs, p_lhsclass ) && CCommon.isssignableto( p_rhs, p_rhsclass )
+               ? Stream.of( CMultiply.<U, V>apply( p_lhs, p_rhs, p_function, p_return ) )
+               : Stream.of();
     }
 
     /**
