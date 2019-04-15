@@ -92,7 +92,7 @@ public final class CMultiply extends IBaseAlgebra
         ) )
             throw new CExecutionIllegalStateException( p_context, org.lightjason.agentspeak.common.CCommon.languagestring( this, "operatorerror" ) );
 
-        return Stream.of();
+        return Stream.empty();
     }
 
     /**
@@ -114,7 +114,7 @@ public final class CMultiply extends IBaseAlgebra
     {
         return CCommon.isssignableto( p_lhs, p_lhsclass ) && CCommon.isssignableto( p_rhs, p_rhsclass )
                ? Stream.of( CMultiply.<U, V>apply( p_lhs, p_rhs, p_function, p_return ) )
-               : Stream.of();
+               : Stream.empty();
     }
 
     /**

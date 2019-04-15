@@ -90,6 +90,6 @@ public final class CSet extends IBaseAction
                        l_arguments.get( 2 ).<Number>raw().doubleValue()
                    ) );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

@@ -111,7 +111,7 @@ public final class CParse extends IBaseAction
                            .map( CRawTerm::of )
                            .forEach( p_return::add );
 
-                return Stream.of();
+                return Stream.empty();
 
             case SPARSE:
                 l_arguments.stream()
@@ -122,7 +122,7 @@ public final class CParse extends IBaseAction
                            .map( CRawTerm::of )
                            .forEach( p_return::add );
 
-                return Stream.of();
+                return Stream.empty();
 
             default:
                 throw new CExecutionIllegealArgumentException(

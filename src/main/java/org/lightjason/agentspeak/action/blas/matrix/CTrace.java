@@ -84,6 +84,6 @@ public final class CTrace extends IBaseAlgebra
                .map( CRawTerm::of )
                .forEach( p_return::add );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

@@ -89,6 +89,6 @@ public final class CEigen extends IBaseAction
                    p_return.add( CRawTerm.of( i.getV() ) );
                } );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

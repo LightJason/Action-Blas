@@ -85,6 +85,6 @@ public final class CDimension extends IBaseAction
                    p_return.add( CRawTerm.of( (double) i.columns() ) );
                } );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

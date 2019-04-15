@@ -91,6 +91,6 @@ public final class CSingularValue extends IBaseAction
                    p_return.add( CRawTerm.of( i.getV() ) );
                } );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

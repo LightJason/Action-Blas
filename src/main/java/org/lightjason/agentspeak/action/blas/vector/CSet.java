@@ -85,6 +85,6 @@ public final class CSet extends IBaseAction
                    .map( ITerm::<DoubleMatrix1D>raw )
                    .forEach( i -> i.setQuick( l_arguments.get( 0 ).<Number>raw().intValue(), l_arguments.get( 1 ).<Number>raw().doubleValue() ) );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

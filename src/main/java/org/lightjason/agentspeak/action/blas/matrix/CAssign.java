@@ -105,6 +105,6 @@ public final class CAssign extends IBaseAction
                        } ) )
             throw new CExecutionIllegealArgumentException( p_context, org.lightjason.agentspeak.common.CCommon.languagestring( this, "argumenterror" ) );
 
-        return Stream.of();
+        return Stream.empty();
     }
 }

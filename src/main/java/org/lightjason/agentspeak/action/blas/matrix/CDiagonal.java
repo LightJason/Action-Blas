@@ -100,7 +100,7 @@ public final class CDiagonal extends IBaseAlgebra
                .forEach( p_return::add );
 
 
-        return Stream.of();
+        return Stream.empty();
     }
 
     /**

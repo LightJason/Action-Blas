@@ -130,7 +130,7 @@ public final class CElementWise extends IBaseAction
         } ) )
             throw new CExecutionIllegalStateException( p_context, org.lightjason.agentspeak.common.CCommon.languagestring( this, "operatorerror" ) );
 
-        return Stream.of();
+        return Stream.empty();
     }
 
 
