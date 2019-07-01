@@ -39,7 +39,9 @@ import org.lightjason.agentspeak.testing.IBaseTest;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -203,16 +205,20 @@ public final class TestCActionMathBlas extends IBaseTest
 
         l_print.formatter().add( new CFormat1D() );
 
+        final double[] l_data = new double[]{0, 1, 2, 3};
         Assert.assertTrue(
             execute(
                 l_print,
                 false,
-                Stream.of( new DenseDoubleMatrix1D( new double[]{0, 1, 2, 3} ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
+                Stream.of( new DenseDoubleMatrix1D( l_data ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
                 Collections.emptyList()
             )
         );
 
-        Assert.assertEquals( "[4](0,00000,1,00000,2,00000,3,00000)\n", l_output.toString( StandardCharsets.UTF_8 ) );
+        Assert.assertEquals(
+            MessageFormat.format( "[4]({0})\n", Arrays.stream( l_data ).mapToObj( i -> String.format( "%G", i ) ).collect( Collectors.joining( " " ) ) ),
+            l_output.toString( StandardCharsets.UTF_8 )
+        );
     }
 
     /**
@@ -228,16 +234,25 @@ public final class TestCActionMathBlas extends IBaseTest
 
         l_print.formatter().add( new CFormat2D() );
 
+        final double[][] l_data = new double[][]{{0, 1}, {2, 3}};
         Assert.assertTrue(
             execute(
                 l_print,
                 false,
-                Stream.of( new DenseDoubleMatrix2D( new double[][]{{0, 1}, {2, 3}} ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
+                Stream.of( new DenseDoubleMatrix2D( l_data ) ).map( CRawTerm::of ).collect( Collectors.toList() ),
                 Collections.emptyList()
             )
         );
 
-        Assert.assertEquals( "[2x2](0,00000,1,00000; 2,00000,3,00000)\n", l_output.toString( StandardCharsets.UTF_8 ) );
+        Assert.assertEquals(
+            MessageFormat.format(
+                "[2x2]({0})\n",
+                Arrays.stream( l_data )
+                      .map( j -> Arrays.stream( j ).mapToObj( i -> String.format( "%G", i ) ).collect( Collectors.joining( " " ) ) )
+                      .collect( Collectors.joining( "; " ) )
+            ),
+            l_output.toString( StandardCharsets.UTF_8 )
+        );
     }
 
 }

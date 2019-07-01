@@ -45,7 +45,7 @@ public abstract class IBaseFormat<T> extends IBaseFormatter<T>
     {
         FORMATTER = new DoubleFormatter();
         FORMATTER.setRowSeparator( "; " );
-        FORMATTER.setColumnSeparator( "," );
+        FORMATTER.setColumnSeparator( " " );
         FORMATTER.setPrintShape( false );
     }
 
