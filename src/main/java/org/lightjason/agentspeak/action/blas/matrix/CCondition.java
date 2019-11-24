@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [C1|C2] = .math/blas/matrix/condition(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Condition_number
+ * @see <a href="https://en.wikipedia.org/wiki/Condition_number"></a>
  */
 public final class CCondition extends IBaseAlgebra
 {

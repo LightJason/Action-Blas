@@ -44,7 +44,7 @@ import java.util.stream.Stream;
  *
  * {@code [R1|R2] = .math/blas/matrix/rank(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Rank_(linear_algebra)
+ * @see <a href="https://en.wikipedia.org/wiki/Rank_(linear_algebra)"></a>
  */
 public final class CRank extends IBaseAlgebra
 {

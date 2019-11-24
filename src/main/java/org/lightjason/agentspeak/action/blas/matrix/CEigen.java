@@ -47,7 +47,7 @@ import java.util.stream.Stream;
  *
  * {@code [Values1|Vectors1|Values2|Vectors2] = .math/blas/matrix/eigen( Matrix1, Matrix2 );}
  *
- * @see https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
+ * @see <a href="https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors"></a>
  */
 public final class CEigen extends IBaseAction
 {

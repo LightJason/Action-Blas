@@ -54,7 +54,7 @@ import java.util.stream.Stream;
  *
  * {@code [E1|E2|E3] = .math/blas/matrix/perronfrobenius(5, M1, M2, M3);}
  *
- * @see https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem
+ * @see <a href="https://en.wikipedia.org/wiki/Perron%E2%80%93Frobenius_theorem"></a>
  */
 public final class CPerronFrobenius extends IBaseAlgebra
 {

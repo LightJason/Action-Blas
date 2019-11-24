@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  *
  * {@code [M1|M2|M3] = .blas/matrix/power(3, M1, [M2, [M3]]);}
  *
- * @see https://en.wikipedia.org/wiki/Matrix_exponential
+ * @see <a href="https://en.wikipedia.org/wiki/Matrix_exponential"></a>
  */
 public final class CPower extends IBaseAlgebra
 {

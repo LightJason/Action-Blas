@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [N1|N2] = .math/blas/matrix/onenorm(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Matrix_norm
+ * @see <a href="https://en.wikipedia.org/wiki/Matrix_norm"></a>
  */
 public final class COneNorm extends IBaseAlgebra
 {

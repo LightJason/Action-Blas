@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [N1|N2] = .math/blas/matrix/twonorm(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Matrix_norm
+ * @see <a href="https://en.wikipedia.org/wiki/Matrix_norm"></a>
  */
 public final class CTwoNorm extends IBaseAlgebra
 {

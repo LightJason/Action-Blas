@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [I1|I2] = .math/blas/matrix/invert(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Invertible_matrix
+ * @see <a href="https://en.wikipedia.org/wiki/Invertible_matrix"></a>
  */
 public final class CInvert extends IBaseAlgebra
 {

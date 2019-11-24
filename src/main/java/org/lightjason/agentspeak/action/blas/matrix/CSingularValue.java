@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  *
  * {@code [Values1|U1|V1|Values2|U2|V2] = .blas/matrix/singularvalue(Matrix1, Matrix2);}
  *
- * @see https://en.wikipedia.org/wiki/Singular_value_decomposition
+ * @see <a href="https://en.wikipedia.org/wiki/Singular_value_decomposition"></a>
  */
 public final class CSingularValue extends IBaseAction
 {

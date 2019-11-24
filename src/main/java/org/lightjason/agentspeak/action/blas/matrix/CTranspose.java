@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [T1|T2] = .math/blas/matrix/transpose(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Transpose
+ * @see <a href="https://en.wikipedia.org/wiki/Transpose"></a>
  */
 public final class CTranspose extends IBaseAlgebra
 {

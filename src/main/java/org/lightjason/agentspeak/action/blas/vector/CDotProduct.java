@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  *
  * {@code [D1|D2] = .math/blas/vector(V1,V2, [V3, V4] );}
  *
- * @see https://en.wikipedia.org/wiki/Dot_product
+ * @see <a href="https://en.wikipedia.org/wiki/Dot_product"></a>
  */
 public final class CDotProduct extends IBaseAction
 {

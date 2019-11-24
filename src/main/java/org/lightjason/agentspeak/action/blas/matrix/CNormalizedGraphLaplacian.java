@@ -48,7 +48,7 @@ import java.util.stream.Stream;
  *
  * {@code [L1|L2] = .math/blas/matrix/normalizedgraphlaplacian( AdjacencyMatrix1, AdjacencyMatrix2 );}
  *
- * @see https://en.wikipedia.org/wiki/Laplacian_matrix
+ * @see <a href="https://en.wikipedia.org/wiki/Laplacian_matrix"></a>
  */
 public final class CNormalizedGraphLaplacian extends IBaseAlgebra
 {

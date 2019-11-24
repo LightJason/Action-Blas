@@ -44,7 +44,7 @@ import java.util.stream.Stream;
  *
  * {@code [T1|T2] = .math/blas/matrix/trace(M1,M2);}
  *
- * @see https://en.wikipedia.org/wiki/Trace_(linear_algebra)
+ * @see <a href="https://en.wikipedia.org/wiki/Trace_(linear_algebra)"></a>
  */
 public final class CTrace extends IBaseAlgebra
 {

@@ -45,7 +45,7 @@ import java.util.stream.Stream;
  *
  * {@code [D1|D2|D3] = .math/blas/determinant(M1, [M2, M3]);}
  *
- * @see https://en.wikipedia.org/wiki/Determinant
+ * @see <a href="https://en.wikipedia.org/wiki/Determinant"></a>
  */
 public final class CDeterminant extends IBaseAlgebra
 {
