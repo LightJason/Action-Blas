@@ -32,7 +32,17 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.lightjason.agentspeak.action.IAction;
+import org.lightjason.agentspeak.action.blas.vector.CAssign;
+import org.lightjason.agentspeak.action.blas.vector.CCopy;
 import org.lightjason.agentspeak.action.blas.vector.CCreate;
+import org.lightjason.agentspeak.action.blas.vector.CFromList;
+import org.lightjason.agentspeak.action.blas.vector.CGet;
+import org.lightjason.agentspeak.action.blas.vector.CLambdaStreaming;
+import org.lightjason.agentspeak.action.blas.vector.CNonZero;
+import org.lightjason.agentspeak.action.blas.vector.CParse;
+import org.lightjason.agentspeak.action.blas.vector.CSet;
+import org.lightjason.agentspeak.action.blas.vector.CSum;
+import org.lightjason.agentspeak.action.blas.vector.CToList;
 import org.lightjason.agentspeak.error.context.CExecutionIllegealArgumentException;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
@@ -80,8 +90,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
         return Stream.of(
 
                     Arguments.of( Stream.of( l_vector1, l_vector2 ), CNonZero.class, Stream.of( 4D, 4D ) ),
-                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CSum.class, Stream.of( l_vector1.zSum(), l_vector2.zSum() ) ),
-                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CSum.class, Stream.of( 60.0 ) )
+                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CSum.class, Stream.of( l_vector1.zSum(), l_vector2.zSum() ) )
 
         );
     }
@@ -100,7 +109,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
      */
     @ParameterizedTest
     @MethodSource( "generator" )
-    public void action( final Stream<ITerm> p_input, final Class<? extends IAction> p_action, final Stream<Object> p_result )
+    public void action( final Stream<Object> p_input, final Class<? extends IAction> p_action, final Stream<Object> p_result )
         throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
     {
         final List<ITerm> l_return = new ArrayList<>();
