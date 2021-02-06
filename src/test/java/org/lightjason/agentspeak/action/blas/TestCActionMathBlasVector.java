@@ -26,28 +26,13 @@ package org.lightjason.agentspeak.action.blas;
 import cern.colt.matrix.AbstractMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
-import com.codepoetics.protonpack.StreamUtils;
-import com.tngtech.java.junit.dataprovider.DataProvider;
-import com.tngtech.java.junit.dataprovider.DataProviderRunner;
-import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Triple;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.lightjason.agentspeak.action.IAction;
-import org.lightjason.agentspeak.action.blas.vector.CAssign;
-import org.lightjason.agentspeak.action.blas.vector.CCopy;
 import org.lightjason.agentspeak.action.blas.vector.CCreate;
-import org.lightjason.agentspeak.action.blas.vector.CDotProduct;
-import org.lightjason.agentspeak.action.blas.vector.CFromList;
-import org.lightjason.agentspeak.action.blas.vector.CGet;
-import org.lightjason.agentspeak.action.blas.vector.CLambdaStreaming;
-import org.lightjason.agentspeak.action.blas.vector.CNonZero;
-import org.lightjason.agentspeak.action.blas.vector.CParse;
-import org.lightjason.agentspeak.action.blas.vector.CSet;
-import org.lightjason.agentspeak.action.blas.vector.CSum;
-import org.lightjason.agentspeak.action.blas.vector.CToList;
 import org.lightjason.agentspeak.error.context.CExecutionIllegealArgumentException;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
@@ -58,7 +43,6 @@ import org.lightjason.agentspeak.testing.IBaseTest;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,7 +52,6 @@ import java.util.stream.Stream;
 /**
  * test math blas vector functions
  */
-@RunWith( DataProviderRunner.class )
 public final class TestCActionMathBlasVector extends IBaseTest
 {
 
@@ -89,44 +72,17 @@ public final class TestCActionMathBlasVector extends IBaseTest
      * data provider generator
      * @return data
      */
-    @DataProvider
-    public static Object[] generator()
+    public static Stream<Arguments> generator()
     {
-        return testcase(
+        final DoubleMatrix1D l_vector1 = new DenseDoubleMatrix1D( new double[]{2, 5, 3, 8} );
+        final DoubleMatrix1D l_vector2 = new DenseDoubleMatrix1D( new double[]{8, 6, 2, 1} );
 
-                Stream.of( VECTOR1, VECTOR2 ),
+        return Stream.of(
 
-                Stream.of(
-                        CNonZero.class,
-                        CSum.class,
-                        CDotProduct.class
-                ),
-                Stream.of( 4D, 4D ),
-                Stream.of( VECTOR1.zSum(), VECTOR2.zSum() ),
-                Stream.of( 60.0 )
+                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CNonZero.class, Stream.of( 4D, 4D ) ),
+                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CSum.class, Stream.of( l_vector1.zSum(), l_vector2.zSum() ) ),
+                    Arguments.of( Stream.of( l_vector1, l_vector2 ), CSum.class, Stream.of( 60.0 ) )
 
-        ).toArray();
-    }
-
-
-    /**
-     * method to generate test-cases
-     *
-     * @param p_input input data
-     * @param p_classes matching test-classes / test-cases
-     * @param p_classresult result for each class
-     * @return test-object
-     */
-    @SafeVarargs
-    @SuppressWarnings( "varargs" )
-    private static Stream<Object> testcase( final Stream<Object> p_input, final Stream<Class<?>> p_classes, final Stream<Object>... p_classresult )
-    {
-        final List<ITerm> l_input = p_input.map( CRawTerm::of ).collect( Collectors.toList() );
-
-        return StreamUtils.zip(
-                p_classes,
-                Arrays.stream( p_classresult ),
-            ( i, j ) -> new ImmutableTriple<>( l_input, i, j )
         );
     }
 
@@ -134,29 +90,31 @@ public final class TestCActionMathBlasVector extends IBaseTest
     /**
      * test all input actions
      *
-     * @param p_input tripel input data, actions and results
+     * @param p_input input data,
+     * @param p_action action
+     * @param p_result results
      * @throws IllegalAccessException is thrwon on instantiation error
      * @throws InstantiationException is thrwon on instantiation error
      * @throws NoSuchMethodException is thrwon on instantiation error
      * @throws InvocationTargetException is thrwon on instantiation error
      */
-    @Test
-    @UseDataProvider( "generator" )
-    public void action( final Triple<List<ITerm>, Class<? extends IAction>, Stream<Object>> p_input )
+    @ParameterizedTest
+    @MethodSource( "generator" )
+    public void action( final Stream<ITerm> p_input, final Class<? extends IAction> p_action, final Stream<Object> p_result )
         throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException
     {
         final List<ITerm> l_return = new ArrayList<>();
 
-        p_input.getMiddle().getConstructor().newInstance().execute(
+        p_action.getConstructor().newInstance().execute(
             false, IContext.EMPTYPLAN,
-            p_input.getLeft(),
+            p_input.map( CRawTerm::of ).collect( Collectors.toList() ),
             l_return
         );
 
-        Assert.assertArrayEquals(
-                p_input.getMiddle().toGenericString(),
+        Assertions.assertArrayEquals(
                 l_return.stream().map( ITerm::raw ).toArray(),
-                p_input.getRight().toArray()
+                p_result.toArray(),
+                p_action.toGenericString()
         );
     }
 
@@ -189,10 +147,10 @@ public final class TestCActionMathBlasVector extends IBaseTest
         );
 
 
-        Assert.assertEquals( 3, l_return.size() );
-        Assert.assertEquals( 2, l_return.get( 0 ).<DoubleMatrix1D>raw().size() );
-        Assert.assertEquals( 4, l_return.get( 1 ).<DoubleMatrix1D>raw().size() );
-        Assert.assertEquals( 3, l_return.get( 2 ).<DoubleMatrix1D>raw().size() );
+        Assertions.assertEquals( 3, l_return.size() );
+        Assertions.assertEquals( 2, l_return.get( 0 ).<DoubleMatrix1D>raw().size() );
+        Assertions.assertEquals( 4, l_return.get( 1 ).<DoubleMatrix1D>raw().size() );
+        Assertions.assertEquals( 3, l_return.get( 2 ).<DoubleMatrix1D>raw().size() );
     }
 
     /**
@@ -209,7 +167,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
             Collections.emptyList()
         );
 
-        Assert.assertEquals( 6, l_vector.get( 0 ), 0 );
+        Assertions.assertEquals( 6, l_vector.get( 0 ), 0 );
     }
 
     /**
@@ -226,11 +184,11 @@ public final class TestCActionMathBlasVector extends IBaseTest
             l_return
         );
 
-        Assert.assertEquals( l_return.size(), 1 );
-        Assert.assertTrue( l_return.get( 0 ).raw() instanceof List );
+        Assertions.assertEquals( l_return.size(), 1 );
+        Assertions.assertTrue( l_return.get( 0 ).raw() instanceof List );
 
         final List<Number> l_tolist = l_return.get( 0 ).raw();
-        Assert.assertArrayEquals( Stream.of( 2.0, 5.0, 3.0, 8.0 ).collect( Collectors.toList() ).toArray(), l_tolist.toArray() );
+        Assertions.assertArrayEquals( Stream.of( 2.0, 5.0, 3.0, 8.0 ).collect( Collectors.toList() ).toArray(), l_tolist.toArray() );
     }
 
     /**
@@ -247,7 +205,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
             Collections.emptyList()
         );
 
-        Assert.assertArrayEquals( Stream.of( 2, 2, 2, 2 ).mapToDouble( i -> i ).toArray(), l_vector.toArray(), 0 );
+        Assertions.assertArrayEquals( Stream.of( 2, 2, 2, 2 ).mapToDouble( i -> i ).toArray(), l_vector.toArray(), 0 );
     }
 
     /**
@@ -264,21 +222,22 @@ public final class TestCActionMathBlasVector extends IBaseTest
             Collections.emptyList()
         );
 
-        Assert.assertArrayEquals( VECTOR2.toArray(), l_vector.toArray(), 0 );
+        Assertions.assertArrayEquals( VECTOR2.toArray(), l_vector.toArray(), 0 );
     }
 
     /**
      * test assign error
      */
-    @Test( expected = CExecutionIllegealArgumentException.class )
+    @Test
     public void assignerror()
     {
-        new CAssign().execute(
-            false, IContext.EMPTYPLAN,
-            Stream.of( "xxx", VECTOR1 ).map( CRawTerm::of ).collect( Collectors.toList() ),
-            Collections.emptyList()
+        Assertions.assertThrows( CExecutionIllegealArgumentException.class,
+                                 () -> new CAssign().execute(
+                                     false, IContext.EMPTYPLAN,
+                                     Stream.of( "xxx", VECTOR1 ).map( CRawTerm::of ).collect( Collectors.toList() ),
+                                     Collections.emptyList()
+                                )
         );
-
     }
 
 
@@ -296,9 +255,9 @@ public final class TestCActionMathBlasVector extends IBaseTest
             l_return
         );
 
-        Assert.assertEquals( 1, l_return.size() );
-        Assert.assertTrue( l_return.get( 0 ).raw() instanceof Double );
-        Assert.assertEquals( 2, l_return.get( 0 ).<Double>raw(), 0 );
+        Assertions.assertEquals( 1, l_return.size() );
+        Assertions.assertTrue( l_return.get( 0 ).raw() instanceof Double );
+        Assertions.assertEquals( 2, l_return.get( 0 ).<Double>raw(), 0 );
     }
 
     /**
@@ -315,8 +274,8 @@ public final class TestCActionMathBlasVector extends IBaseTest
             l_return
         );
 
-        Assert.assertEquals( 2, l_return.size() );
-        Assert.assertArrayEquals( Stream.of( VECTOR1, VECTOR2 ).toArray(), l_return.stream().map( ITerm::raw ).toArray() );
+        Assertions.assertEquals( 2, l_return.size() );
+        Assertions.assertArrayEquals( Stream.of( VECTOR1, VECTOR2 ).toArray(), l_return.stream().map( ITerm::raw ).toArray() );
     }
 
     /**
@@ -339,9 +298,9 @@ public final class TestCActionMathBlasVector extends IBaseTest
             l_return
         );
 
-        Assert.assertEquals( l_return.size(), 2 );
-        Assert.assertArrayEquals( new double[]{1, 2, 3}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0 );
-        Assert.assertArrayEquals( new double[]{4, 3, 4}, l_return.get( 1 ).<DoubleMatrix1D>raw().toArray(), 0 );
+        Assertions.assertEquals( l_return.size(), 2 );
+        Assertions.assertArrayEquals( new double[]{1, 2, 3}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0 );
+        Assertions.assertArrayEquals( new double[]{4, 3, 4}, l_return.get( 1 ).<DoubleMatrix1D>raw().toArray(), 0 );
     }
 
     /**
@@ -364,9 +323,9 @@ public final class TestCActionMathBlasVector extends IBaseTest
             l_return
         );
 
-        Assert.assertEquals( l_return.size(), 2 );
-        Assert.assertArrayEquals( new double[]{1, 2, 3}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0 );
-        Assert.assertArrayEquals( new double[]{4, 3, 4}, l_return.get( 1 ).<DoubleMatrix1D>raw().toArray(), 0 );
+        Assertions.assertEquals( l_return.size(), 2 );
+        Assertions.assertArrayEquals( new double[]{1, 2, 3}, l_return.get( 0 ).<DoubleMatrix1D>raw().toArray(), 0 );
+        Assertions.assertArrayEquals( new double[]{4, 3, 4}, l_return.get( 1 ).<DoubleMatrix1D>raw().toArray(), 0 );
     }
 
     /**
@@ -377,7 +336,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
     {
         final ILambdaStreaming<?> l_lambda = new CLambdaStreaming();
 
-        Assert.assertTrue(
+        Assertions.assertTrue(
             Stream.of(
                 AbstractMatrix1D.class,
                 DoubleMatrix1D.class
@@ -391,7 +350,7 @@ public final class TestCActionMathBlasVector extends IBaseTest
     @Test
     public void lambda()
     {
-        Assert.assertArrayEquals(
+        Assertions.assertArrayEquals(
             Stream.of( 2.0, 5.0, 3.0, 8.0 ).toArray(),
             new CLambdaStreaming().apply( VECTOR1 ).toArray()
         );

@@ -27,10 +27,9 @@ import cern.colt.matrix.tdouble.DoubleMatrix1D;
 import cern.colt.matrix.tdouble.DoubleMatrix2D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.tdouble.impl.DenseDoubleMatrix2D;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.lightjason.agentspeak.action.generic.CPrint;
 import org.lightjason.agentspeak.language.CRawTerm;
 import org.lightjason.agentspeak.language.ITerm;
@@ -76,7 +75,7 @@ public final class TestCActionMathBlas extends IBaseTest
     /**
      * test initialize
      */
-    @Before
+    @BeforeEach
     public void initialize()
     {
         m_matrix1 = new DenseDoubleMatrix2D( new double[][]{{2, 6}, {3, 8}} );
